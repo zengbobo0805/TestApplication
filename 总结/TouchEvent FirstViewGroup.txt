@@ -1,0 +1,160 @@
+###################################################
+FirstViewGroup处理总结：
+1。FirstViewGroup返回值取决于自己的onTouchEvent事件返回值；
+2。FirstViewGroup  onInterceptTouchEvent 事件只有在down的时候才会调用，move up不调用；
+3。只有FirstViewGroup dispatchTouchEvent down返回值为true时，才会消耗后续  move up事件；
+3。FirstViewGroup  onInterceptTouchEvent 返回值为true，事件不会传给子控件；
+
+###################################################
+
+
+～～～～～～～～～～～～～第1种～～～～～～～～～～～～～～～
+默认调用步骤：都直接继承父类方法，返回都是false；
+结论：如果所有事件方法都返回false，只会执行down事件；
+01-22 15:45:56.556 6280-6280/com.test D/FirstViewGroup: dispatchTouchEvent getAction:0
+01-22 15:45:56.556 6280-6280/com.test D/FirstViewGroup: onInterceptTouchEvent getAction:0
+01-22 15:45:56.556 6280-6280/com.test D/FirstViewGroup: onInterceptTouchEvent getAction:0,flag:false
+01-22 15:45:56.556 6280-6280/com.test D/FirstView: dispatchTouchEvent getAction:0
+01-22 15:45:56.556 6280-6280/com.test D/FirstView: onTouchEvent getAction:0
+01-22 15:45:56.556 6280-6280/com.test D/FirstView: onTouchEvent getAction:0,flag:false
+01-22 15:45:56.556 6280-6280/com.test D/FirstView: dispatchTouchEvent getAction:0,flag:false
+01-22 15:45:56.556 6280-6280/com.test D/FirstViewGroup: onTouchEvent getAction:0
+01-22 15:45:56.556 6280-6280/com.test D/FirstViewGroup: onTouchEvent getAction:0,flag:false
+01-22 15:45:56.556 6280-6280/com.test D/FirstViewGroup: dispatchTouchEvent getAction:0,flag:false
+
+～～～～～～～～～～～～～第2种～～～～～～～～～～～～～～～
+默认调用步骤：FirstViewGroup dispatchTouchEvent直接返回true；
+结论：down  move  up 只有FirstViewGroup dispatchTouchEvent执行；
+
+01-22 15:49:42.606 6369-6369/com.test D/FirstViewGroup: dispatchTouchEvent getAction:0
+01-22 15:49:42.606 6369-6369/com.test D/FirstViewGroup: dispatchTouchEvent getAction:0,flag:true
+01-22 15:49:42.836 6369-6369/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 15:49:42.836 6369-6369/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:true
+01-22 15:49:42.856 6369-6369/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 15:49:42.856 6369-6369/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:true
+01-22 15:49:42.956 6369-6369/com.test D/FirstViewGroup: dispatchTouchEvent getAction:1
+01-22 15:49:42.956 6369-6369/com.test D/FirstViewGroup: dispatchTouchEvent getAction:1,flag:true
+
+～～～～～～～～～～～～～第3种～～～～～～～～～～～～～～～
+默认调用步骤：FirstViewGroup onInterceptTouchEvent 直接返回true；
+结论：只有down事件， 只有FirstViewGroup 事件才会执行；
+01-22 15:53:50.666 6456-6456/com.test D/FirstViewGroup: dispatchTouchEvent getAction:0
+01-22 15:53:50.666 6456-6456/com.test D/FirstViewGroup: onInterceptTouchEvent getAction:0
+01-22 15:53:50.666 6456-6456/com.test D/FirstViewGroup: onInterceptTouchEvent getAction:0,flag:true
+01-22 15:53:50.666 6456-6456/com.test D/FirstViewGroup: onTouchEvent getAction:0
+01-22 15:53:50.666 6456-6456/com.test D/FirstViewGroup: onTouchEvent getAction:0,flag:false
+01-22 15:53:50.666 6456-6456/com.test D/FirstViewGroup: dispatchTouchEvent getAction:0,flag:false
+
+～～～～～～～～～～～～～第4种～～～～～～～～～～～～～～～
+默认调用步骤：FirstViewGroup onTouchEvent 直接返回true；
+结论：down事件都会执行，后续move  up只有FirstViewGroup的dispatchTouchEvent onTouchEvent执行；
+01-22 15:56:27.716 6544-6544/com.test D/FirstViewGroup: dispatchTouchEvent getAction:0
+01-22 15:56:27.716 6544-6544/com.test D/FirstViewGroup: onInterceptTouchEvent getAction:0
+01-22 15:56:27.716 6544-6544/com.test D/FirstViewGroup: onInterceptTouchEvent getAction:0,flag:false
+01-22 15:56:27.716 6544-6544/com.test D/FirstView: dispatchTouchEvent getAction:0
+01-22 15:56:27.716 6544-6544/com.test D/FirstView: onTouchEvent getAction:0
+01-22 15:56:27.716 6544-6544/com.test D/FirstView: onTouchEvent getAction:0,flag:false
+01-22 15:56:27.716 6544-6544/com.test D/FirstView: dispatchTouchEvent getAction:0,flag:false
+01-22 15:56:27.716 6544-6544/com.test D/FirstViewGroup: onTouchEvent getAction:0
+01-22 15:56:27.716 6544-6544/com.test D/FirstViewGroup: onTouchEvent getAction:0,flag:true
+01-22 15:56:27.716 6544-6544/com.test D/FirstViewGroup: dispatchTouchEvent getAction:0,flag:true
+01-22 15:56:28.216 6544-6544/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 15:56:28.216 6544-6544/com.test D/FirstViewGroup: onTouchEvent getAction:2
+01-22 15:56:28.216 6544-6544/com.test D/FirstViewGroup: onTouchEvent getAction:2,flag:true
+01-22 15:56:28.216 6544-6544/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:true
+01-22 15:56:28.236 6544-6544/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 15:56:28.236 6544-6544/com.test D/FirstViewGroup: onTouchEvent getAction:2
+01-22 15:56:28.236 6544-6544/com.test D/FirstViewGroup: onTouchEvent getAction:2,flag:true
+01-22 15:56:28.236 6544-6544/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:true
+01-22 15:56:28.266 6544-6544/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 15:56:28.266 6544-6544/com.test D/FirstViewGroup: onTouchEvent getAction:2
+01-22 15:56:28.266 6544-6544/com.test D/FirstViewGroup: onTouchEvent getAction:2,flag:true
+01-22 15:56:28.266 6544-6544/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:true
+01-22 15:56:28.286 6544-6544/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 15:56:28.286 6544-6544/com.test D/FirstViewGroup: onTouchEvent getAction:2
+01-22 15:56:28.286 6544-6544/com.test D/FirstViewGroup: onTouchEvent getAction:2,flag:true
+01-22 15:56:28.286 6544-6544/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:true
+01-22 15:56:28.356 6544-6544/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 15:56:28.356 6544-6544/com.test D/FirstViewGroup: onTouchEvent getAction:2
+01-22 15:56:28.356 6544-6544/com.test D/FirstViewGroup: onTouchEvent getAction:2,flag:true
+01-22 15:56:28.356 6544-6544/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:true
+01-22 15:56:28.386 6544-6544/com.test D/FirstViewGroup: dispatchTouchEvent getAction:1
+01-22 15:56:28.386 6544-6544/com.test D/FirstViewGroup: onTouchEvent getAction:1
+01-22 15:56:28.386 6544-6544/com.test D/FirstViewGroup: onTouchEvent getAction:1,flag:true
+01-22 15:56:28.386 6544-6544/com.test D/FirstViewGroup: dispatchTouchEvent getAction:1,flag:true
+
+～～～～～～～～～～～～～第5种～～～～～～～～～～～～～～～
+默认调用步骤：FirstViewGroup dispatchTouchEvent down直接返回true；
+结论：down move  up只有FirstViewGroup执行；
+
+～～～～～～～～～～～～～第6种～～～～～～～～～～～～～～～
+默认调用步骤：FirstViewGroup onInterceptTouchEvent down直接返回true；
+结论：down 只有FirstViewGroup执行；
+
+01-22 16:07:34.476 6897-6897/com.test D/FirstViewGroup: dispatchTouchEvent getAction:0
+01-22 16:07:34.476 6897-6897/com.test D/FirstViewGroup: onInterceptTouchEvent getAction:0
+01-22 16:07:34.476 6897-6897/com.test D/FirstViewGroup: onInterceptTouchEvent getAction:0,flag:true
+01-22 16:07:34.476 6897-6897/com.test D/FirstViewGroup: onTouchEvent getAction:0
+01-22 16:07:34.476 6897-6897/com.test D/FirstViewGroup: onTouchEvent getAction:0,flag:false
+01-22 16:07:34.476 6897-6897/com.test D/FirstViewGroup: dispatchTouchEvent getAction:0,flag:false
+
+～～～～～～～～～～～～～第7种～～～～～～～～～～～～～～～
+默认调用步骤：FirstViewGroup onTouchEvent down直接返回true；
+结论：down 事件都会执行，move  up只有FirstViewGroup执行；
+
+01-22 16:08:51.666 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:0
+01-22 16:08:51.666 6961-6961/com.test D/FirstViewGroup: onInterceptTouchEvent getAction:0
+01-22 16:08:51.666 6961-6961/com.test D/FirstViewGroup: onInterceptTouchEvent getAction:0,flag:false
+01-22 16:08:51.666 6961-6961/com.test D/FirstView: dispatchTouchEvent getAction:0
+01-22 16:08:51.666 6961-6961/com.test D/FirstView: onTouchEvent getAction:0
+01-22 16:08:51.666 6961-6961/com.test D/FirstView: onTouchEvent getAction:0,flag:false
+01-22 16:08:51.666 6961-6961/com.test D/FirstView: dispatchTouchEvent getAction:0,flag:false
+01-22 16:08:51.666 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:0
+01-22 16:08:51.666 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:0,flag:true
+01-22 16:08:51.666 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:0,flag:true
+01-22 16:08:51.686 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 16:08:51.686 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2
+01-22 16:08:51.686 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2,flag:false
+01-22 16:08:51.686 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:false
+01-22 16:08:51.816 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 16:08:51.816 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2
+01-22 16:08:51.816 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2,flag:false
+01-22 16:08:51.816 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:false
+01-22 16:08:51.836 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 16:08:51.836 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2
+01-22 16:08:51.836 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2,flag:false
+01-22 16:08:51.836 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:false
+01-22 16:08:51.856 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 16:08:51.856 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2
+01-22 16:08:51.856 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2,flag:false
+01-22 16:08:51.856 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:false
+01-22 16:08:51.866 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 16:08:51.866 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2
+01-22 16:08:51.866 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2,flag:false
+01-22 16:08:51.866 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:false
+01-22 16:08:51.886 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 16:08:51.886 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2
+01-22 16:08:51.886 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2,flag:false
+01-22 16:08:51.886 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:false
+01-22 16:08:51.906 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 16:08:51.906 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2
+01-22 16:08:51.906 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2,flag:false
+01-22 16:08:51.906 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:false
+01-22 16:08:51.916 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 16:08:51.916 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2
+01-22 16:08:51.916 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2,flag:false
+01-22 16:08:51.916 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:false
+01-22 16:08:51.936 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 16:08:51.936 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2
+01-22 16:08:51.936 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2,flag:false
+01-22 16:08:51.936 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:false
+01-22 16:08:51.956 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2
+01-22 16:08:51.956 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2
+01-22 16:08:51.956 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:2,flag:false
+01-22 16:08:51.956 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:2,flag:false
+01-22 16:08:51.986 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:1
+01-22 16:08:51.986 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:1
+01-22 16:08:51.986 6961-6961/com.test D/FirstViewGroup: onTouchEvent getAction:1,flag:false
+01-22 16:08:51.986 6961-6961/com.test D/FirstViewGroup: dispatchTouchEvent getAction:1,flag:false
+
+
