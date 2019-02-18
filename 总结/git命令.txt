@@ -1,0 +1,8 @@
+1。 临时性保存修改
+    git stash
+    暂存的提交依旧还在
+    git stash list
+    在回到分支后，你就可以取回所有暂存的变更了：
+    git stash pop
+
+2.

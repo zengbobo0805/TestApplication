@@ -7,5 +7,6 @@ public class LogUtil {
 
     public static void i(String log) {
         Log.i(TAG, log);
+
     }
 }
